@@ -164,6 +164,24 @@ class IntTensor(BaseTensor):
         """
         return list(np.fromstring(self.get("shape")[:-1], sep=",").astype('int'))
 
+    def split(self, split_size_or_sections, dim=0):
+        """
+        Splits the tensor into chunks. If split_size_or_sections is an integer type, then tensor will be split into chunks of size split_size_or_sections (if possible). Last chunk will be smaller if the tensor size along a given dimension is not divisible by split_size. If split_size_or_sections is a list, then tensor will be split into len(split_size_or_sections) chunks with sizes in dim according to split_size_or_sections.
+        Parameters
+        ----------
+        split_size_or_sections : int or list(int)
+            size of a single chunk or of sizes for each chunk
+        dim: int
+            dimension along which to split the tensor.
+        """
+
+        if isinstance(split_size_or_sections, int):
+            return self.controller.params_func(cmd_func=self.cmd,name="split_by_size", params=[split_size_or_sections, dim],return_type='IntTensor_list')
+        split_size_or_sections = list(split_size_or_sections)
+        assert type(split_size_or_sections) == list
+        assert type(split_size_or_sections[0]) == int
+        return self.controller.params_func(cmd_func=self.cmd,name="split_by_sections", params=split_size_or_sections+[dim], return_type='IntTensor_list')
+
     def sqrt(self):
         """
         Returns a new tensor with the square-root of the elements of input.
